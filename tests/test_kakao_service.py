@@ -63,6 +63,14 @@ def test_meal_preference_filters_dessert_and_keeps_full_meal_duration():
             "distance": "20",
         },
         {
+            "id": "quick-1",
+            "place_name": "테스트 샌드위치",
+            "category_name": "음식점 > 패스트푸드 > 샌드위치",
+            "x": "126.9850",
+            "y": "37.5640",
+            "distance": "40",
+        },
+        {
             "id": "meal-1",
             "place_name": "테스트 한식당",
             "category_name": "음식점 > 한식",

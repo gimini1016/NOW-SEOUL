@@ -474,7 +474,7 @@ class KakaoLocalService:
                 for place in parsed
                 if not any(
                     keyword in (place.category_name or "")
-                    for keyword in self.MEAL_EXCLUDE_KEYWORDS
+                    for keyword in self.MEAL_EXCLUDE_KEYWORDS | self.QUICK_KEYWORDS
                 )
             ]
             if meal_places:
