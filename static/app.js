@@ -52,7 +52,7 @@ const translations = {
 };
 
 const state = {
-  language: "en",
+  language: new URLSearchParams(window.location.search).get("lang") === "ko" ? "ko" : "en",
   latitude: 37.5636,
   longitude: 126.9869,
   locationName: "Myeongdong",

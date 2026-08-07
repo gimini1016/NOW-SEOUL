@@ -15,6 +15,7 @@
   --shadow: 0 22px 60px rgba(68, 51, 34, 0.1);
   --sans: "DM Sans", "Noto Sans KR", sans-serif;
   --display: "Fraunces", "Noto Sans KR", serif;
+  --display-ko: "Noto Serif KR", serif;
 }
 
 * { box-sizing: border-box; }
@@ -103,6 +104,31 @@ a { color: inherit; text-decoration: none; }
 .mini-itinerary strong { font-family: var(--display); font-size: 16px; font-weight: 600; }
 .mini-itinerary i { width: 1px; height: 18px; margin: 4px 0 4px 6px; border-left: 1px dashed var(--persimmon); }
 .mini-itinerary small { margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--line); color: var(--forest); font-size: 8px; }
+
+html[lang="ko"] .hero h1,
+html[lang="ko"] .section-intro h2,
+html[lang="ko"] .course-heading h3,
+html[lang="ko"] .map-header strong,
+html[lang="ko"] .method-copy h2,
+html[lang="ko"] .loading-overlay strong {
+  font-family: var(--display-ko);
+  font-style: normal;
+  letter-spacing: -.04em;
+  word-break: keep-all;
+}
+html[lang="ko"] .hero h1 {
+  max-width: 660px;
+  font-size: clamp(48px, 4.25vw, 68px);
+  line-height: 1.18;
+}
+html[lang="ko"] .hero h1 em,
+html[lang="ko"] .how-it-works h2 em {
+  font-style: normal;
+}
+html[lang="ko"] .section-intro h2,
+html[lang="ko"] .method-copy h2 {
+  line-height: 1.24;
+}
 
 .planner { padding: 115px 5vw 130px; background: var(--paper); }
 .section-intro { display: grid; margin-bottom: 55px; grid-template-columns: 18% 82%; }
@@ -264,6 +290,7 @@ footer { display: flex; padding: 31px 5vw; align-items: center; justify-content:
   .brand small { display: none; }
   .hero { padding-top: 120px; }
   .hero h1 { font-size: 15vw; }
+  html[lang="ko"] .hero h1 { font-size: 12.5vw; line-height: 1.22; }
   .hero-description { font-size: 13px; }
   .hero-proof { gap: 15px; }
   .hero-proof span { padding-right: 15px; }
