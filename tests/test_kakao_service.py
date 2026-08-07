@@ -51,6 +51,34 @@ def test_kakao_cafe_receives_cafe_duration():
     assert place.minimum_duration_minutes == 30
 
 
+def test_meal_preference_filters_dessert_and_keeps_full_meal_duration():
+    service = KakaoLocalService()
+    documents = [
+        {
+            "id": "dessert-1",
+            "place_name": "테스트 젤라또",
+            "category_name": "음식점 > 간식 > 아이스크림",
+            "x": "126.9850",
+            "y": "37.5640",
+            "distance": "20",
+        },
+        {
+            "id": "meal-1",
+            "place_name": "테스트 한식당",
+            "category_name": "음식점 > 한식",
+            "x": "126.9848",
+            "y": "37.5642",
+            "distance": "80",
+        },
+    ]
+
+    places = service._parse_documents(documents, "FD6", "meal", PLACES)
+
+    assert [place.name_ko for place in places] == ["테스트 한식당"]
+    assert places[0].duration_minutes == 55
+    assert places[0].minimum_duration_minutes == 45
+
+
 def test_kakao_http_errors_are_reported_without_exposing_credentials():
     reason = KakaoLocalService._kakao_error_reason
     assert reason(401, None) == "authentication-error"

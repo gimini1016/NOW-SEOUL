@@ -238,6 +238,17 @@ class KakaoLocalService:
         "제과",
         "패스트푸드",
     }
+    MEAL_EXCLUDE_KEYWORDS = {
+        "간식",
+        "도넛",
+        "디저트",
+        "베이커리",
+        "빙수",
+        "아이스크림",
+        "제과",
+        "젤라또",
+        "카페",
+    }
 
     def __init__(self) -> None:
         self.api_key = os.getenv("KAKAO_REST_API_KEY", "").strip()
@@ -413,7 +424,11 @@ class KakaoLocalService:
             is_quick = any(keyword in category_name for keyword in self.QUICK_KEYWORDS)
             if is_cafe:
                 duration, minimum_duration = 40, 30
-            elif food_preference == "quick" or is_quick:
+            elif food_preference == "quick":
+                duration, minimum_duration = 35, 25
+            elif food_preference == "meal":
+                duration, minimum_duration = 55, 45
+            elif is_quick:
                 duration, minimum_duration = 35, 25
             else:
                 duration, minimum_duration = 55, 45
@@ -453,7 +468,19 @@ class KakaoLocalService:
                 )
             )
 
-        if food_preference == "quick":
+        if food_preference == "meal":
+            meal_places = [
+                place
+                for place in parsed
+                if not any(
+                    keyword in (place.category_name or "")
+                    for keyword in self.MEAL_EXCLUDE_KEYWORDS
+                )
+            ]
+            if meal_places:
+                parsed = meal_places
+            parsed.sort(key=lambda place: place.distance_meters or 999999)
+        elif food_preference == "quick":
             parsed.sort(
                 key=lambda place: (
                     not any(keyword in (place.category_name or "") for keyword in self.QUICK_KEYWORDS),
