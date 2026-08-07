@@ -52,7 +52,11 @@ def test_kakao_cafe_receives_cafe_duration():
 
 
 def test_kakao_http_errors_are_reported_without_exposing_credentials():
-    assert KakaoLocalService._http_error_reason(401) == "authentication-error"
-    assert KakaoLocalService._http_error_reason(403) == "permission-error"
-    assert KakaoLocalService._http_error_reason(429) == "quota-error"
-    assert KakaoLocalService._http_error_reason(500) == "upstream-http-500"
+    reason = KakaoLocalService._kakao_error_reason
+    assert reason(401, None) == "authentication-error"
+    assert reason(403, -3) == "feature-not-enabled"
+    assert reason(403, -5) == "permission-required"
+    assert reason(403, -12) == "app-suspended"
+    assert reason(401, -401) == "invalid-key-or-ip"
+    assert reason(429, None) == "quota-error"
+    assert reason(500, None) == "upstream-http-500"

@@ -294,7 +294,7 @@ class KakaoLocalService:
                 )
                 successful_requests += 1
             except HTTPError as error:
-                request_errors.append(self._http_error_reason(error.code))
+                request_errors.append(self._http_error_reason(error))
                 documents_by_category[category] = []
             except (URLError, OSError, TimeoutError):
                 request_errors.append("connection-error")
@@ -323,8 +323,31 @@ class KakaoLocalService:
         self.cache.set(cache_key, places)
         return places
 
+    @classmethod
+    def _http_error_reason(cls, error: HTTPError) -> str:
+        kakao_code = None
+        try:
+            payload = json.loads(error.read().decode("utf-8", errors="replace"))
+            kakao_code = payload.get("code") if isinstance(payload, dict) else None
+        except (OSError, ValueError, json.JSONDecodeError):
+            pass
+        return cls._kakao_error_reason(error.code, kakao_code)
+
     @staticmethod
-    def _http_error_reason(status_code: int) -> str:
+    def _kakao_error_reason(status_code: int, kakao_code: int | None) -> str:
+        code_reasons = {
+            -3: "feature-not-enabled",
+            -4: "account-restricted",
+            -5: "permission-required",
+            -6: "action-not-allowed",
+            -10: "quota-error",
+            -12: "app-suspended",
+            -13: "app-inactive",
+            -401: "invalid-key-or-ip",
+            -903: "unregistered-key",
+        }
+        if kakao_code in code_reasons:
+            return code_reasons[kakao_code]
         return {
             401: "authentication-error",
             403: "permission-error",
