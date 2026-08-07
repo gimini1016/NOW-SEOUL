@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="NOW SEOUL turns one to four free hours into a crowd-aware Seoul micro itinerary."
+    />
+    <meta name="theme-color" content="#f7f1e6" />
+    <title>NOW SEOUL — Make the time yours</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Sans+KR:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/assets/style.css?v=2" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="NOW SEOUL home">
+        <span class="brand-mark" aria-hidden="true">N</span>
+        <span>NOW <b>SEOUL</b><small>MICRO TRIPS, MADE TO FIT</small></span>
+      </a>
+      <div class="header-meta">
+        <span class="live-clock" id="seoul-clock">SEOUL · --:--</span>
+        <div class="language-switch" aria-label="Language">
+          <button class="active" type="button" data-language="en">EN</button>
+          <button type="button" data-language="ko">KR</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><i></i><span data-i18n="eyebrow">YOUR NEXT SEOUL MOMENT</span></p>
+          <h1 data-i18n-html="heroTitle">One free hour?<br /><em>Make it feel like Seoul.</em></h1>
+          <p class="hero-description" data-i18n="heroDescription">
+            Tell us where you are, how much time you have, and what feels like you. We’ll make three Seoul routes that fit before your next plan.
+          </p>
+          <a class="hero-cta" href="#planner">
+            <span data-i18n="startPlanning">Plan a route</span>
+            <i aria-hidden="true">↘</i>
+          </a>
+          <div class="hero-proof">
+            <span><strong>1–4H</strong><small data-i18n="proofTime">FREE TIME</small></span>
+            <span><strong>TOP 3</strong><small data-i18n="proofRoutes">ROUTES</small></span>
+            <span><strong>LIVE</strong><small data-i18n="proofCrowds">CROWD SIGNAL</small></span>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img
+            src="/assets/images/seoul-stroll-hero.jpg"
+            alt="A traveler taking a golden-hour walk through a quiet historic street in Seoul"
+          />
+          <div class="photo-caption" aria-hidden="true">
+            <span>SEOUL · 16:42</span>
+            <strong>OLD CITY, NEW MOMENT</strong>
+          </div>
+          <div class="mini-itinerary" aria-hidden="true">
+            <span>2 HOURS FREE</span>
+            <strong>Deoksugung</strong>
+            <i></i>
+            <strong>Jeongdong-gil</strong>
+            <small>Fits with 12 min to spare</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="planner" id="planner">
+        <div class="section-intro">
+          <p class="section-number">01 / PLAN</p>
+          <div>
+            <h2 data-i18n="plannerTitle">What does your free time look like?</h2>
+            <p data-i18n="plannerDescription">Four quick choices. No account, no over-planning.</p>
+          </div>
+        </div>
+
+        <form class="planner-form" id="planner-form">
+          <fieldset class="form-step location-step">
+            <legend>
+              <span>01</span>
+              <span><b data-i18n="locationTitle">Where are you now?</b><small data-i18n="locationHint">Use GPS or pick a nearby hub</small></span>
+            </legend>
+            <button class="gps-button" id="gps-button" type="button">
+              <span class="gps-icon" aria-hidden="true"></span>
+              <span><b data-i18n="useLocation">Use my current location</b><small id="location-status">Myeongdong selected</small></span>
+            </button>
+            <div class="preset-list" aria-label="Starting point presets">
+              <button class="preset active" type="button" data-preset="myeongdong" data-lat="37.5636" data-lon="126.9869">Myeongdong</button>
+              <button class="preset" type="button" data-preset="seoul-station" data-lat="37.5547" data-lon="126.9707">Seoul Station</button>
+              <button class="preset" type="button" data-preset="gwanghwamun" data-lat="37.5759" data-lon="126.9768">Gwanghwamun</button>
+              <button class="preset" type="button" data-preset="hongdae" data-lat="37.5572" data-lon="126.9246">Hongdae</button>
+              <button class="preset" type="button" data-preset="gangnam" data-lat="37.4979" data-lon="127.0276">Gangnam</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-step">
+            <legend>
+              <span>02</span>
+              <span><b data-i18n="timeTitle">How much time is yours?</b><small data-i18n="timeHint">We always keep a safety buffer</small></span>
+            </legend>
+            <div class="time-display"><strong id="time-hours">2</strong><span data-i18n="hours">HOURS</span></div>
+            <div class="time-options" role="group" aria-label="Available time">
+              <button type="button" data-minutes="60">1H</button>
+              <button class="active" type="button" data-minutes="120">2H</button>
+              <button type="button" data-minutes="180">3H</button>
+              <button type="button" data-minutes="240">4H</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-step preferences-step">
+            <legend>
+              <span>03</span>
+              <span><b data-i18n="tasteTitle">What are you in the mood for?</b><small data-i18n="tasteHint">Choose as many as you like</small></span>
+            </legend>
+            <div class="preference-grid">
+              <button class="preference active" type="button" data-preference="photo" aria-pressed="true"><i>◫</i><span data-i18n="photo">Photo</span></button>
+              <button class="preference" type="button" data-preference="food" aria-pressed="false"><i>◌</i><span data-i18n="food">Food</span></button>
+              <button class="preference active" type="button" data-preference="culture" aria-pressed="true"><i>◇</i><span data-i18n="culture">Culture</span></button>
+              <button class="preference" type="button" data-preference="shopping" aria-pressed="false"><i>□</i><span data-i18n="shopping">Shopping</span></button>
+              <button class="preference" type="button" data-preference="nature" aria-pressed="false"><i>⌁</i><span data-i18n="nature">Nature</span></button>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-step crowd-step">
+            <legend>
+              <span>04</span>
+              <span><b data-i18n="crowdTitle">How do you feel about crowds?</b><small data-i18n="crowdHint">We’ll tune the route around you</small></span>
+            </legend>
+            <div class="crowd-options" role="group" aria-label="Crowd tolerance">
+              <button class="active" type="button" data-crowd="low"><i></i><span><b data-i18n="avoidCrowds">Avoid them</b><small data-i18n="avoidCrowdsHint">Quiet route first</small></span></button>
+              <button type="button" data-crowd="medium"><i></i><span><b data-i18n="someCrowds">Some are fine</b><small data-i18n="someCrowdsHint">Balanced route</small></span></button>
+              <button type="button" data-crowd="high"><i></i><span><b data-i18n="anyCrowds">I don’t mind</b><small data-i18n="anyCrowdsHint">Best-known spots</small></span></button>
+            </div>
+          </fieldset>
+
+          <button class="submit-button" type="submit">
+            <span data-i18n="findRoutes">Find my Seoul</span>
+            <i aria-hidden="true">→</i>
+          </button>
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section class="results" id="results" hidden>
+        <div class="section-intro results-intro">
+          <p class="section-number">02 / GO</p>
+          <div>
+            <p class="result-kicker"><span></span><span data-i18n="routesReady">YOUR ROUTES ARE READY</span></p>
+            <h2 data-i18n="resultsTitle">Three ways to spend the moment.</h2>
+            <p id="results-notice"></p>
+          </div>
+        </div>
+
+        <div class="results-layout">
+          <div class="course-list" id="course-list"></div>
+          <aside class="map-panel">
+            <div class="map-header">
+              <div><small data-i18n="routeView">ROUTE VIEW</small><strong id="map-title">Your Seoul route</strong></div>
+              <span class="source-pill" id="source-pill">ESTIMATED DATA</span>
+            </div>
+            <div id="route-map" aria-label="Recommended route map"></div>
+            <div class="map-fallback" id="map-fallback" hidden data-i18n="mapFallback">Map tiles are unavailable. Your stop order is still shown in the route cards.</div>
+            <div class="map-legend">
+              <span><i class="origin-dot"></i><span data-i18n="youAreHere">You are here</span></span>
+              <span><i class="stop-dot"></i><span data-i18n="recommendedStop">Recommended stop</span></span>
+              <span class="route-disclaimer" data-i18n="routeEstimate">Route line and walking time are estimates</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="how-it-works">
+        <p class="section-number">03 / METHOD</p>
+        <div class="method-copy">
+          <h2 data-i18n-html="methodTitle">Not another full itinerary.<br /><em>Just the right next move.</em></h2>
+          <p data-i18n="methodDescription">NOW SEOUL filters what is open, scores what matches your mood, checks nearby crowd signals, and only keeps routes that fit your real time budget.</p>
+        </div>
+        <div class="method-steps">
+          <div><span>01</span><b data-i18n="methodOne">Find nearby places</b><small>GPS + TOUR DATA</small></div>
+          <div><span>02</span><b data-i18n="methodTwo">Respect the clock</b><small>TRAVEL + VISIT + BUFFER</small></div>
+          <div><span>03</span><b data-i18n="methodThree">Tune for the moment</b><small>TASTE + CROWD SIGNAL</small></div>
+        </div>
+      </section>
+    </main>
+
+    <div class="loading-overlay" id="loading-overlay" hidden role="status" aria-live="polite">
+      <div class="loading-orbit"><i></i><i></i><span>N</span></div>
+      <strong data-i18n="loadingTitle">Making time fit...</strong>
+      <small data-i18n="loadingHint">Checking distance, stays and crowd signals</small>
+    </div>
+
+    <footer>
+      <a class="brand footer-brand" href="#top"><span class="brand-mark">N</span><span>NOW <b>SEOUL</b></span></a>
+      <p>Turn your free time into Seoul time.</p>
+      <span>SEOUL · 2026</span>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/assets/app.js?v=2" defer></script>
+  </body>
+</html>
