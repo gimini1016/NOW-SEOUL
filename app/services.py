@@ -6,6 +6,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from urllib.parse import quote, urlencode
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from app.models import CrowdSnapshot, FoodPreference, Place
@@ -241,10 +242,23 @@ class KakaoLocalService:
     def __init__(self) -> None:
         self.api_key = os.getenv("KAKAO_REST_API_KEY", "").strip()
         self.cache = TTLCache(ttl_seconds=900)
+        self.last_error: str | None = None
 
     @property
     def is_live(self) -> bool:
         return bool(self.api_key)
+
+    @property
+    def status(self) -> str:
+        if not self.is_live:
+            return "off"
+        return "error" if self.last_error else "live"
+
+    @property
+    def status_detail(self) -> str:
+        if not self.is_live:
+            return "not-configured"
+        return self.last_error or "ready"
 
     def search_nearby(
         self,
@@ -268,6 +282,8 @@ class KakaoLocalService:
             categories = ["FD6", "CE7"]
 
         documents_by_category: dict[str, list[dict]] = {}
+        successful_requests = 0
+        request_errors: list[str] = []
         for category in categories:
             try:
                 documents_by_category[category] = self._fetch_category(
@@ -276,8 +292,18 @@ class KakaoLocalService:
                     longitude,
                     radius_meters,
                 )
-            except (OSError, TimeoutError, ValueError, KeyError, json.JSONDecodeError):
+                successful_requests += 1
+            except HTTPError as error:
+                request_errors.append(self._http_error_reason(error.code))
                 documents_by_category[category] = []
+            except (URLError, OSError, TimeoutError):
+                request_errors.append("connection-error")
+                documents_by_category[category] = []
+            except (ValueError, KeyError, json.JSONDecodeError):
+                request_errors.append("invalid-response")
+                documents_by_category[category] = []
+
+        self.last_error = None if successful_requests else (request_errors[0] if request_errors else "upstream-error")
 
         places_by_category = {
             category: self._parse_documents(
@@ -296,6 +322,14 @@ class KakaoLocalService:
 
         self.cache.set(cache_key, places)
         return places
+
+    @staticmethod
+    def _http_error_reason(status_code: int) -> str:
+        return {
+            401: "authentication-error",
+            403: "permission-error",
+            429: "quota-error",
+        }.get(status_code, f"upstream-http-{status_code}")
 
     def _fetch_category(
         self,

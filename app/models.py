@@ -96,7 +96,8 @@ class DataSourceStatus(BaseModel):
     tour_api: Literal["live", "demo"]
     seoul_city_data: Literal["live", "estimated"]
     routing: Literal["walking-estimate"]
-    kakao_local: Literal["live", "off"] = "off"
+    kakao_local: Literal["live", "off", "error"] = "off"
+    kakao_local_detail: str = "not-configured"
 
 
 class RecommendationResponse(BaseModel):

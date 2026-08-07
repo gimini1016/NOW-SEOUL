@@ -49,3 +49,10 @@ def test_kakao_cafe_receives_cafe_duration():
     assert place.place_type == "cafe"
     assert place.duration_minutes == 40
     assert place.minimum_duration_minutes == 30
+
+
+def test_kakao_http_errors_are_reported_without_exposing_credentials():
+    assert KakaoLocalService._http_error_reason(401) == "authentication-error"
+    assert KakaoLocalService._http_error_reason(403) == "permission-error"
+    assert KakaoLocalService._http_error_reason(429) == "quota-error"
+    assert KakaoLocalService._http_error_reason(500) == "upstream-http-500"

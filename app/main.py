@@ -40,6 +40,16 @@ tour_service = TourAPIService()
 kakao_service = KakaoLocalService()
 
 
+def data_source_status() -> DataSourceStatus:
+    return DataSourceStatus(
+        tour_api="live" if tour_service.is_live else "demo",
+        seoul_city_data="live" if crowd_service.is_live else "estimated",
+        routing="walking-estimate",
+        kakao_local=kakao_service.status,
+        kakao_local_detail=kakao_service.status_detail,
+    )
+
+
 @app.get("/", include_in_schema=False)
 def homepage() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
@@ -57,12 +67,7 @@ def config() -> dict:
         "preferences": ["photo", "culture", "shopping", "nature"],
         "food_stop_modes": ["none", "optional", "required"],
         "food_preferences": ["quick", "meal", "cafe", "any"],
-        "data_sources": DataSourceStatus(
-            tour_api="live" if tour_service.is_live else "demo",
-            seoul_city_data="live" if crowd_service.is_live else "estimated",
-            routing="walking-estimate",
-            kakao_local="live" if kakao_service.is_live else "off",
-        ),
+        "data_sources": data_source_status(),
     }
 
 
@@ -122,11 +127,6 @@ def recommend(request: RecommendationRequest) -> RecommendationResponse:
         courses=courses,
         generated_at=now.isoformat(),
         origin=[request.latitude, request.longitude],
-        data_sources=DataSourceStatus(
-            tour_api="live" if tour_service.is_live else "demo",
-            seoul_city_data="live" if crowd_service.is_live else "estimated",
-            routing="walking-estimate",
-            kakao_local="live" if kakao_service.is_live else "off",
-        ),
+        data_sources=data_source_status(),
         notice=language_notice[request.language],
     )
