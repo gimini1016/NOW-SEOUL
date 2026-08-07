@@ -7,6 +7,10 @@ Preference = Literal["photo", "food", "culture", "shopping", "nature"]
 CrowdTolerance = Literal["low", "medium", "high"]
 Language = Literal["en", "ko"]
 CrowdLevel = Literal["relaxed", "normal", "busy", "crowded"]
+FoodStopMode = Literal["none", "optional", "required"]
+FoodPreference = Literal["quick", "meal", "cafe", "any"]
+PlaceType = Literal["attraction", "restaurant", "cafe"]
+PlaceSource = Literal["curated", "tourapi", "kakao-local"]
 
 
 class Place(BaseModel):
@@ -28,6 +32,13 @@ class Place(BaseModel):
     opening_note_en: str = "Check current opening hours"
     opening_note_ko: str = "방문 전 운영시간 확인"
     image_url: str | None = None
+    place_type: PlaceType = "attraction"
+    data_source: PlaceSource = "curated"
+    category_name: str | None = None
+    address: str | None = None
+    distance_meters: int | None = Field(default=None, ge=0)
+    external_url: str | None = None
+    minimum_duration_minutes: int | None = Field(default=None, ge=10, le=120)
 
 
 class CrowdSnapshot(BaseModel):
@@ -45,6 +56,8 @@ class RecommendationRequest(BaseModel):
     preferences: list[Preference] = Field(min_length=1, max_length=5)
     crowd_tolerance: CrowdTolerance = "low"
     language: Language = "en"
+    food_stop: FoodStopMode = "none"
+    food_preference: FoodPreference = "any"
 
 
 class CourseStop(BaseModel):
@@ -60,6 +73,8 @@ class CourseStop(BaseModel):
 class TimeBudget(BaseModel):
     travel_minutes: int
     visit_minutes: int
+    activity_minutes: int = 0
+    food_minutes: int = 0
     buffer_minutes: int
     unused_minutes: int
     total_minutes: int
@@ -81,6 +96,7 @@ class DataSourceStatus(BaseModel):
     tour_api: Literal["live", "demo"]
     seoul_city_data: Literal["live", "estimated"]
     routing: Literal["walking-estimate"]
+    kakao_local: Literal["live", "off"] = "off"
 
 
 class RecommendationResponse(BaseModel):

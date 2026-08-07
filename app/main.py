@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from app.data import PLACES, PRESET_ORIGINS
 from app.engine import candidate_places, recommend_courses
 from app.models import DataSourceStatus, RecommendationRequest, RecommendationResponse
-from app.services import SeoulCrowdService, TourAPIService
+from app.services import KakaoLocalService, SeoulCrowdService, TourAPIService
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +37,7 @@ app.mount("/assets", StaticFiles(directory=STATIC_DIR), name="assets")
 
 crowd_service = SeoulCrowdService()
 tour_service = TourAPIService()
+kakao_service = KakaoLocalService()
 
 
 @app.get("/", include_in_schema=False)
@@ -53,11 +54,14 @@ def health() -> dict[str, str]:
 def config() -> dict:
     return {
         "presets": PRESET_ORIGINS,
-        "preferences": ["photo", "food", "culture", "shopping", "nature"],
+        "preferences": ["photo", "culture", "shopping", "nature"],
+        "food_stop_modes": ["none", "optional", "required"],
+        "food_preferences": ["quick", "meal", "cafe", "any"],
         "data_sources": DataSourceStatus(
             tour_api="live" if tour_service.is_live else "demo",
             seoul_city_data="live" if crowd_service.is_live else "estimated",
             routing="walking-estimate",
+            kakao_local="live" if kakao_service.is_live else "off",
         ),
     }
 
@@ -71,7 +75,26 @@ def places() -> list:
 def recommend(request: RecommendationRequest) -> RecommendationResponse:
     now = datetime.now(SEOUL_TZ)
     enriched_places = tour_service.enrich(PLACES, request.latitude, request.longitude)
-    candidates = candidate_places(request, enriched_places, now)
+    attraction_candidates = candidate_places(request, enriched_places, now)
+    food_candidates = []
+    if request.food_stop != "none":
+        food_candidates = kakao_service.search_nearby(
+            request.latitude,
+            request.longitude,
+            request.food_preference,
+            attraction_candidates,
+            radius_meters=max(900, min(2500, request.available_minutes * 10)),
+        )
+
+    if request.food_stop == "required" and not food_candidates:
+        detail = (
+            "No nearby restaurant or café data was available. Try 'show me an option' or skip it."
+            if request.language == "en"
+            else "주변 음식점·카페 정보를 찾지 못했습니다. '선택지로 보기' 또는 '필요 없어요'를 선택해 주세요."
+        )
+        raise HTTPException(status_code=422, detail=detail)
+
+    candidates = attraction_candidates + food_candidates[:9]
 
     if not candidates:
         raise HTTPException(status_code=422, detail="No open places were available for this request.")
@@ -90,6 +113,11 @@ def recommend(request: RecommendationRequest) -> RecommendationResponse:
         "en": "Walking times and opening hours are estimates. Check official information before visiting.",
         "ko": "도보시간과 운영시간은 추정치입니다. 방문 전 공식 정보를 확인해 주세요.",
     }
+    if food_candidates:
+        language_notice = {
+            "en": language_notice["en"] + " Restaurant and café details link to Kakao Map.",
+            "ko": language_notice["ko"] + " 음식점·카페 상세정보는 카카오맵에서 확인할 수 있어요.",
+        }
     return RecommendationResponse(
         courses=courses,
         generated_at=now.isoformat(),
@@ -98,6 +126,7 @@ def recommend(request: RecommendationRequest) -> RecommendationResponse:
             tour_api="live" if tour_service.is_live else "demo",
             seoul_city_data="live" if crowd_service.is_live else "estimated",
             routing="walking-estimate",
+            kakao_local="live" if kakao_service.is_live else "off",
         ),
         notice=language_notice[request.language],
     )

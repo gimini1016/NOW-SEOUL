@@ -97,7 +97,15 @@ def _sequence_metrics(
     buffer_minutes = max(10, round(request.available_minutes * 0.08 / 5) * 5)
     available_for_visits = request.available_minutes - travel_minutes - buffer_minutes
     minimum_visit = 20 if request.available_minutes <= 90 else 30
-    minimum_durations = [min(minimum_visit, place.duration_minutes) for place in sequence]
+    minimum_durations = [
+        min(
+            place.duration_minutes,
+            place.minimum_duration_minutes
+            if place.minimum_duration_minutes is not None
+            else minimum_visit,
+        )
+        for place in sequence
+    ]
     if sum(minimum_durations) > available_for_visits:
         return None
 
@@ -119,7 +127,9 @@ def _sequence_metrics(
         return None
 
     preference_scores = [
-        len(set(place.tags) & set(request.preferences)) / max(1, len(set(request.preferences)))
+        1.0
+        if place.place_type in {"restaurant", "cafe"} and request.food_stop != "none"
+        else len(set(place.tags) & set(request.preferences)) / max(1, len(set(request.preferences)))
         for place in sequence
     ]
     preference_score = sum(preference_scores) / len(preference_scores)
@@ -148,6 +158,11 @@ def _sequence_metrics(
         "total_minutes": total_minutes,
         "leg_minutes": leg_minutes,
         "visit_durations": visit_durations,
+        "food_minutes": sum(
+            duration
+            for place, duration in zip(sequence, visit_durations)
+            if place.place_type in {"restaurant", "cafe"}
+        ),
         "crowd_value": max(CROWD_VALUE[crowds[place.hotspot].level] for place in sequence),
         "preference_score": preference_score,
     }
@@ -185,6 +200,50 @@ def _select_diverse(options: list[tuple[tuple[Place, ...], dict]]) -> list[tuple
     return selected
 
 
+def _contains_food(sequence: tuple[Place, ...]) -> bool:
+    return any(place.place_type in {"restaurant", "cafe"} for place in sequence)
+
+
+def _select_for_food_mode(
+    options: list[tuple[tuple[Place, ...], dict]],
+    mode: str,
+) -> list[tuple[tuple[Place, ...], dict]]:
+    food_options = [option for option in options if _contains_food(option[0])]
+    attraction_options = [option for option in options if not _contains_food(option[0])]
+
+    if mode == "required":
+        return _select_diverse(food_options)
+    if mode == "none" or not food_options:
+        return _select_diverse(attraction_options)
+
+    plain_selected = _select_diverse(attraction_options)
+    selected: list[tuple[tuple[Place, ...], dict]] = []
+    if plain_selected:
+        selected.append(plain_selected[0])
+
+    food_choice = next(
+        (
+            option
+            for option in food_options
+            if all(_overlap(existing[0], option[0]) <= 0.75 for existing in selected)
+        ),
+        food_options[0],
+    )
+    selected.append(food_choice)
+
+    for option in plain_selected[1:]:
+        if all(_overlap(existing[0], option[0]) <= 0.65 for existing in selected):
+            selected.append(option)
+        if len(selected) == 3:
+            break
+    for option in attraction_options:
+        if len(selected) == 3:
+            break
+        if option not in selected:
+            selected.append(option)
+    return selected
+
+
 def recommend_courses(
     request: RecommendationRequest,
     places: list[Place],
@@ -194,19 +253,45 @@ def recommend_courses(
     max_stops = 3 if request.available_minutes >= 150 else 2
     for length in range(1, max_stops + 1):
         for sequence in permutations(places, length):
+            food_stop_count = sum(
+                place.place_type in {"restaurant", "cafe"} for place in sequence
+            )
+            if food_stop_count > 1:
+                continue
+            if request.food_stop == "none" and food_stop_count:
+                continue
             metrics = _sequence_metrics(sequence, request, crowds)
             if metrics is not None:
                 options.append((sequence, metrics))
 
     options.sort(key=lambda item: item[1]["score"], reverse=True)
-    selected = _select_diverse(options)
-    badges = ["BEST FIT", "LOW CROWDS", "ALTERNATIVE"]
+    selected = _select_for_food_mode(options, request.food_stop)
+    badges = (
+        ["BEST FIT", "FOOD OPTION", "ALTERNATIVE"]
+        if request.language == "en" and request.food_stop == "optional"
+        else ["가장 잘 맞아요", "식사·카페 선택", "다른 선택지"]
+        if request.language == "ko" and request.food_stop == "optional"
+        else ["BEST FIT", "LOW CROWDS", "ALTERNATIVE"]
+        if request.language == "en"
+        else ["가장 잘 맞아요", "한적한 코스", "다른 선택지"]
+    )
     courses: list[Course] = []
 
     for index, (sequence, metrics) in enumerate(selected):
-        tag_counts = Counter(tag for place in sequence for tag in place.tags if tag in request.preferences)
-        dominant_tag = tag_counts.most_common(1)[0][0] if tag_counts else request.preferences[0]
-        title_en, title_ko = TAG_LABELS[dominant_tag]
+        food_places = [
+            place for place in sequence if place.place_type in {"restaurant", "cafe"}
+        ]
+        if food_places:
+            if food_places[0].place_type == "cafe":
+                title_en, title_ko = "Seoul Café Pause", "서울 카페 쉼표"
+            else:
+                title_en, title_ko = "Seoul & Local Bite", "서울 로컬 한 끼"
+        else:
+            tag_counts = Counter(
+                tag for place in sequence for tag in place.tags if tag in request.preferences
+            )
+            dominant_tag = tag_counts.most_common(1)[0][0] if tag_counts else request.preferences[0]
+            title_en, title_ko = TAG_LABELS[dominant_tag]
         stop_names = [place.name_en if request.language == "en" else place.name_ko for place in sequence]
         summary = " → ".join(stop_names)
         elapsed = 0
@@ -244,6 +329,8 @@ def recommend_courses(
                 time_budget=TimeBudget(
                     travel_minutes=metrics["travel_minutes"],
                     visit_minutes=metrics["visit_minutes"],
+                    activity_minutes=metrics["visit_minutes"] - metrics["food_minutes"],
+                    food_minutes=metrics["food_minutes"],
                     buffer_minutes=metrics["buffer_minutes"],
                     unused_minutes=request.available_minutes - metrics["total_minutes"],
                     total_minutes=metrics["total_minutes"],

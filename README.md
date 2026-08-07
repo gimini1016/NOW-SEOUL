@@ -9,13 +9,15 @@ NOW SEOUL은 외국인 관광객이 서울에서 1~4시간의 애매한 여유�
 
 - 브라우저 GPS 또는 명동·서울역·광화문·홍대·강남 출발지 선택
 - 1~4시간 Time Budget
-- Photo·Food·Culture·Shopping·Nature 다중 취향 선택
+- Photo·Culture·Shopping·Nature 다중 활동 취향 선택
+- 식음료 정차를 `안 들러요`·`선택지로`·`코스에 포함` 중 선택
+- 카카오 로컬 API로 주변 음식점·카페 검색, 거리·주소·카카오맵 링크 표시
 - 혼잡 회피 수준 반영
 - 영업시간과 휴무일을 고려한 후보 필터
 - `이동 + 체류 + 안전 여유시간 ≤ 남은 시간` 제약을 만족하는 코스 TOP 3
 - 영어·한국어 전환
 - 지도 경로, 장소별 도보시간, 체류시간, 혼잡도
-- 이동·관광·여유시간을 나눈 Time Budget 시각화
+- 이동·활동·식사/카페·여유시간을 나눈 Time Budget 시각화
 - TourAPI 이미지 및 서울 실시간 인구 혼잡도 선택적 연동
 - 외부 API 키나 네트워크 장애 시 데모 데이터로 자동 폴백
 
@@ -46,6 +48,7 @@ uvicorn app.main:app --reload
 ```dotenv
 TOUR_API_KEY=공공데이터포털에서_발급한_키
 SEOUL_OPEN_DATA_KEY=서울열린데이터광장에서_발급한_키
+KAKAO_REST_API_KEY=카카오_디벨로퍼스_REST_API_키
 ALLOWED_ORIGINS=*
 ```
 
@@ -75,6 +78,8 @@ API 키는 절대 `static/app.js`나 GitHub 저장소에 넣지 마세요. `.env
   "longitude": 126.9869,
   "available_minutes": 120,
   "preferences": ["photo", "culture"],
+  "food_stop": "optional",
+  "food_preference": "meal",
   "crowd_tolerance": "low",
   "language": "en"
 }
@@ -85,10 +90,11 @@ API 키는 절대 `static/app.js`나 GitHub 저장소에 넣지 마세요. `.env
 1. 현재 운영 중인 장소를 필터링합니다.
 2. 남은 시간에 따라 검색 반경을 정하고 가까운 후보를 선택합니다.
 3. 최대 3개 장소의 순서를 조합합니다.
-4. 각 조합에 대해 도보 이동시간, 체류시간, 안전 여유시간을 계산합니다.
-5. 제한시간을 넘는 조합은 제거합니다.
-6. 취향 38%, 혼잡도 25%, 시간 활용도 20%, 이동 효율 12%, 다양성 5%로 평가합니다.
-7. 장소가 과도하게 겹치지 않는 세 코스를 반환합니다.
+4. 식음료 선택 시 주변 음식점·카페를 후보에 합치고 최대 한 곳만 코스에 넣습니다.
+5. 각 조합에 대해 도보 이동시간, 관광·식음료 체류시간, 안전 여유시간을 계산합니다.
+6. 제한시간을 넘는 조합은 제거합니다.
+7. 취향 38%, 혼잡도 25%, 시간 활용도 20%, 이동 효율 12%, 다양성 5%로 평가합니다.
+8. 장소가 과도하게 겹치지 않는 세 코스를 반환합니다.
 
 ## 테스트
 
@@ -116,4 +122,5 @@ pytest -q
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
 ```
 
-배포 환경변수에 `TOUR_API_KEY`, `SEOUL_OPEN_DATA_KEY`를 추가하면 실시간 모드로 전환됩니다.
+배포 환경변수에 `KAKAO_REST_API_KEY`를 추가하면 음식점·카페 추천이 활성화됩니다.
+`TOUR_API_KEY`, `SEOUL_OPEN_DATA_KEY`는 선택 사항입니다.

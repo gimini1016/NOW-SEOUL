@@ -157,11 +157,24 @@ html[lang="ko"] .method-copy h2 {
 .time-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
 .time-options button { padding: 11px; }
 .time-options button.active { border-color: var(--persimmon); color: white; background: var(--persimmon); }
-.preference-grid { display: grid; margin-top: 27px; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+.preference-grid { display: grid; margin-top: 27px; grid-template-columns: repeat(4, 1fr); gap: 7px; }
 .preference { display: flex; min-width: 0; padding: 14px 5px 12px; align-items: center; flex-direction: column; gap: 8px; border: 1px solid var(--line); border-radius: 11px; color: var(--muted); background: var(--paper); font-size: 9px; }
 .preference i { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; color: var(--forest); background: var(--sage); font: normal 15px var(--sans); }
 .preference.active { border-color: var(--forest); color: var(--forest); background: white; box-shadow: inset 0 -3px var(--persimmon); }
 .preference.active i { color: white; background: var(--forest); }
+.food-mode-options { display: grid; margin-top: 27px; gap: 7px; }
+.food-mode-options button { display: flex; min-width: 0; padding: 11px 14px; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--paper); text-align: left; }
+.food-mode-options button > i { display: grid; width: 22px; height: 22px; flex: 0 0 22px; place-items: center; border-radius: 50%; color: var(--forest); background: var(--sage); font-style: normal; font-size: 10px; font-weight: 700; }
+.food-mode-options button > span { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.food-mode-options b { font-size: 11px; }
+.food-mode-options small { color: var(--muted); font-size: 9px; }
+.food-mode-options button.active { border-color: var(--forest); background: white; box-shadow: inset 3px 0 var(--persimmon); }
+.food-mode-options button.active > i { color: white; background: var(--forest); }
+.food-type-panel { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--line); }
+.food-type-panel > small { color: var(--muted); font-size: 7px; font-weight: 700; letter-spacing: .12em; }
+.food-type-options { display: grid; margin-top: 9px; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.food-type-options button { padding: 9px 10px; border: 1px solid var(--line); border-radius: 100px; color: var(--muted); background: var(--paper); font-size: 8px; font-weight: 600; }
+.food-type-options button.active { border-color: var(--persimmon); color: white; background: var(--persimmon); }
 .crowd-options { display: grid; margin-top: 27px; gap: 7px; }
 .crowd-options button { display: flex; padding: 11px 14px; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--paper); text-align: left; }
 .crowd-options button > i { display: block; width: 11px; height: 11px; border: 1px solid #87938c; border-radius: 50%; }
@@ -188,6 +201,7 @@ html[lang="ko"] .method-copy h2 {
 .course-card { width: 100%; padding: 0; overflow: hidden; border: 1px solid rgba(36, 49, 44, .12); border-radius: 16px; color: var(--ink); background: var(--paper); text-align: left; transition: border-color .2s, transform .2s, box-shadow .2s; }
 .course-card:hover { transform: translateY(-2px); border-color: rgba(231, 101, 69, .55); }
 .course-card.active { border-color: var(--persimmon); box-shadow: 0 16px 40px rgba(79, 56, 38, .09); }
+.course-card-toggle { display: block; width: 100%; padding: 0; border: 0; color: inherit; background: transparent; text-align: left; }
 .course-card-main { display: grid; padding: 22px; grid-template-columns: 58px 1fr auto; align-items: start; gap: 16px; }
 .course-index { color: #9b8c7a; font-family: var(--display); font-size: 25px; }
 .course-heading small { color: var(--persimmon); font-size: 8px; font-weight: 700; letter-spacing: .11em; }
@@ -199,9 +213,17 @@ html[lang="ko"] .method-copy h2 {
 .stop-list { margin: 0 0 18px; padding: 0; list-style: none; }
 .stop-list li { position: relative; display: grid; padding: 10px 0 10px 30px; grid-template-columns: 1fr auto; gap: 12px; border-bottom: 1px solid var(--line); }
 .stop-list li::before { position: absolute; top: 14px; left: 2px; display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; color: white; background: var(--persimmon); content: attr(data-order); font-size: 7px; font-weight: 700; }
+.place-title { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
 .stop-list strong { display: block; font-size: 11px; font-weight: 700; }
 .stop-list small { display: block; margin-top: 3px; color: #7c857f; font-size: 8px; }
-.stop-list time { padding: 5px 8px; border-radius: 100px; color: var(--forest); background: var(--sage); font-size: 8px; font-weight: 700; white-space: nowrap; }
+.place-source { padding: 4px 6px; border-radius: 100px; color: white; background: var(--forest); font-size: 6px; font-weight: 700; letter-spacing: .08em; }
+.place-address { max-width: 390px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.place-actions { display: flex; margin-top: 6px; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 8px; }
+.place-distance { color: var(--forest); font-weight: 600; }
+.place-link { color: var(--persimmon-dark); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.place-link:hover { color: var(--forest); }
+.stop-list time { display: flex; padding: 6px 9px; align-items: flex-end; flex-direction: column; gap: 2px; border-radius: 9px; color: var(--forest); background: var(--sage); font-size: 8px; font-weight: 700; white-space: nowrap; }
+.stop-list time small { margin: 0; color: #67786f; font-size: 6px; font-weight: 600; }
 .crowd-label { display: inline-flex; margin-top: 5px; align-items: center; gap: 5px; color: #69756e; font-size: 7px; font-weight: 600; }
 .crowd-label i { width: 6px; height: 6px; border-radius: 50%; background: var(--crowd-color); }
 .budget-label { display: flex; margin-bottom: 8px; justify-content: space-between; color: #7c857f; font-size: 7px; font-weight: 700; letter-spacing: .07em; }
@@ -209,6 +231,7 @@ html[lang="ko"] .method-copy h2 {
 .time-budget i { display: block; height: 100%; }
 .budget-travel { background: var(--sky); }
 .budget-visit { background: var(--forest); }
+.budget-food { background: var(--sun); }
 .budget-buffer { background: var(--persimmon); }
 .budget-legend { display: flex; margin-top: 9px; gap: 14px; color: #7b847e; font-size: 7px; font-weight: 600; }
 .budget-legend span { display: flex; align-items: center; gap: 5px; }
@@ -299,7 +322,7 @@ footer { display: flex; padding: 31px 5vw; align-items: center; justify-content:
   .photo-caption { right: 13px; bottom: 13px; }
   .planner-form { grid-template-columns: 1fr; }
   .form-step { padding: 27px 18px; }
-  .preference-grid { grid-template-columns: repeat(3, 1fr); }
+  .preference-grid { grid-template-columns: repeat(2, 1fr); }
   .course-card-main { padding: 18px; grid-template-columns: 38px 1fr auto; gap: 10px; }
   .course-index { font-size: 18px; }
   .course-heading h3 { font-size: 20px; }

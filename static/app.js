@@ -5,11 +5,16 @@ const translations = {
     heroDescription: "Tell us where you are, how much time you have, and what feels like you. We’ll make three Seoul routes that fit before your next plan.",
     startPlanning: "Plan a route",
     proofTime: "FREE TIME", proofRoutes: "ROUTES", proofCrowds: "CROWD SIGNAL",
-    plannerTitle: "What does your free time look like?", plannerDescription: "Four quick choices. No account, no over-planning.",
+    plannerTitle: "What does your free time look like?", plannerDescription: "Five quick choices. No account, no over-planning.",
     locationTitle: "Where are you now?", locationHint: "Use GPS or pick a nearby hub", useLocation: "Use my current location",
     timeTitle: "How much time is yours?", timeHint: "We always keep a safety buffer", hours: "HOURS",
     tasteTitle: "What are you in the mood for?", tasteHint: "Choose as many as you like",
     photo: "Photo", food: "Food", culture: "Culture", shopping: "Shopping", nature: "Nature",
+    foodStopTitle: "Add a food or café stop?", foodStopHint: "Only when it fits your real time budget",
+    foodNone: "Skip it", foodNoneHint: "No food stops",
+    foodOptional: "Show me an option", foodOptionalHint: "One of three routes",
+    foodRequired: "Make it part of the route", foodRequiredHint: "Include it whenever possible",
+    foodTypeTitle: "WHAT SOUNDS GOOD?", foodQuick: "Quick bite", foodMeal: "Full meal", foodCafe: "Café & dessert", foodAny: "Anything",
     crowdTitle: "How do you feel about crowds?", crowdHint: "We’ll tune the route around you",
     avoidCrowds: "Avoid them", avoidCrowdsHint: "Quiet route first", someCrowds: "Some are fine", someCrowdsHint: "Balanced route", anyCrowds: "I don’t mind", anyCrowdsHint: "Best-known spots",
     findRoutes: "Find my Seoul", routesReady: "YOUR ROUTES ARE READY", resultsTitle: "Three ways to spend the moment.",
@@ -20,8 +25,8 @@ const translations = {
     methodOne: "Find nearby places", methodTwo: "Respect the clock", methodThree: "Tune for the moment",
     loadingTitle: "Making time fit...", loadingHint: "Checking distance, stays and crowd signals",
     selected: "selected", locating: "Finding your location...", gpsReady: "Current location ready", gpsDenied: "Location unavailable — choose a hub below",
-    travel: "TRAVEL", visit: "VISIT", buffer: "BUFFER", min: "MIN", score: "FIT", crowd: "CROWD", stayTime: "Suggested stay",
-    sourceLive: "LIVE SEOUL DATA", sourceEstimated: "ESTIMATED DATA", requestError: "We couldn’t build the routes. Check the API server and try again.",
+    travel: "TRAVEL", visit: "ACTIVITY", foodTime: "FOOD & CAFÉ", buffer: "BUFFER", min: "MIN", score: "FIT", crowd: "CROWD", stayTime: "Suggested stay",
+    restaurant: "RESTAURANT", cafe: "CAFÉ", kakaoMap: "View on Kakao Map", distanceAway: "away", sourceKakao: "KAKAO LOCAL", sourceLive: "LIVE SEOUL DATA", sourceEstimated: "ESTIMATED DATA", requestError: "We couldn’t build the routes. Check the API server and try again.",
     preferenceError: "Choose at least one activity.", yourRoute: "Your Seoul route",
   },
   ko: {
@@ -30,11 +35,16 @@ const translations = {
     heroDescription: "현재 위치와 남은 시간, 취향을 알려주세요. 다음 일정 전에 딱 맞는 서울 코스 세 가지를 만들어 드립니다.",
     startPlanning: "지금 코스 만들기",
     proofTime: "남는 시간", proofRoutes: "추천 코스", proofCrowds: "혼잡 신호",
-    plannerTitle: "지금 남은 시간은 어떤 모습인가요?", plannerDescription: "네 가지만 고르면 됩니다. 가입도, 복잡한 계획도 필요 없어요.",
+    plannerTitle: "지금 남은 시간은 어떤 모습인가요?", plannerDescription: "다섯 가지만 고르면 됩니다. 가입도, 복잡한 계획도 필요 없어요.",
     locationTitle: "지금 어디에 있나요?", locationHint: "GPS를 사용하거나 가까운 지역 선택", useLocation: "현재 위치 사용하기",
     timeTitle: "얼마나 시간이 남았나요?", timeHint: "항상 안전 여유시간을 남겨요", hours: "시간",
     tasteTitle: "지금 무엇을 하고 싶나요?", tasteHint: "여러 개 선택할 수 있어요",
     photo: "사진", food: "음식", culture: "문화", shopping: "쇼핑", nature: "자연",
+    foodStopTitle: "식사나 카페를 코스에 넣을까요?", foodStopHint: "실제 남은 시간에 맞을 때만 추천해요",
+    foodNone: "안 들러요", foodNoneHint: "관광지 위주 코스",
+    foodOptional: "선택지로 보여주세요", foodOptionalHint: "세 코스 중 하나",
+    foodRequired: "코스에 넣어주세요", foodRequiredHint: "가능한 코스에 포함",
+    foodTypeTitle: "무엇이 땡기나요?", foodQuick: "간단한 한끼", foodMeal: "여유 있는 식사", foodCafe: "카페·디저트", foodAny: "상관없어요",
     crowdTitle: "혼잡한 장소는 어떤가요?", crowdHint: "선호에 맞춰 코스를 조정해요",
     avoidCrowds: "피하고 싶어요", avoidCrowdsHint: "한적한 코스 우선", someCrowds: "조금은 괜찮아요", someCrowdsHint: "균형 잡힌 코스", anyCrowds: "상관없어요", anyCrowdsHint: "대표 명소 우선",
     findRoutes: "내 서울 코스 찾기", routesReady: "코스가 준비됐어요", resultsTitle: "지금 시간을 보내는 세 가지 방법.",
@@ -45,20 +55,27 @@ const translations = {
     methodOne: "가까운 장소 찾기", methodTwo: "남은 시간 지키기", methodThree: "지금의 취향 반영하기",
     loadingTitle: "시간을 맞추는 중...", loadingHint: "거리와 체류시간, 혼잡 신호를 확인하고 있어요",
     selected: "선택됨", locating: "현재 위치를 찾는 중...", gpsReady: "현재 위치 확인 완료", gpsDenied: "위치를 확인할 수 없어요 — 아래 지역을 선택해 주세요",
-    travel: "이동", visit: "관광", buffer: "여유", min: "분", score: "적합", crowd: "혼잡", stayTime: "추천 체류시간",
-    sourceLive: "서울 실시간 데이터", sourceEstimated: "추정 데이터", requestError: "코스를 만들지 못했습니다. API 서버를 확인하고 다시 시도해 주세요.",
+    travel: "이동", visit: "활동", foodTime: "식사·카페", buffer: "여유", min: "분", score: "적합", crowd: "혼잡", stayTime: "추천 체류시간",
+    restaurant: "음식점", cafe: "카페", kakaoMap: "카카오맵에서 보기", distanceAway: "거리", sourceKakao: "카카오 로컬", sourceLive: "서울 실시간 데이터", sourceEstimated: "추정 데이터", requestError: "코스를 만들지 못했습니다. API 서버를 확인하고 다시 시도해 주세요.",
     preferenceError: "활동을 한 개 이상 선택해 주세요.", yourRoute: "나의 서울 코스",
   },
 };
 
+const queryParams = new URLSearchParams(window.location.search);
+const requestedFoodMode = ["none", "optional", "required"].includes(queryParams.get("food")) ? queryParams.get("food") : "none";
+const requestedFoodType = ["quick", "meal", "cafe", "any"].includes(queryParams.get("foodType")) ? queryParams.get("foodType") : "any";
+
 const state = {
-  language: new URLSearchParams(window.location.search).get("lang") === "ko" ? "ko" : "en",
+  language: queryParams.get("lang") === "ko" ? "ko" : "en",
   latitude: 37.5636,
   longitude: 126.9869,
   locationName: "Myeongdong",
   availableMinutes: 120,
   preferences: new Set(["photo", "culture"]),
+  foodStop: requestedFoodMode,
+  foodPreference: requestedFoodType,
   crowdTolerance: "low",
+  dataSources: null,
   courses: [],
   selectedCourse: 0,
   map: null,
@@ -87,6 +104,7 @@ const applyLanguage = () => {
   $$("[data-language]").forEach((button) => button.classList.toggle("active", button.dataset.language === state.language));
   $("#location-status").textContent = `${state.locationName} · ${t("selected")}`;
   updateClock();
+  $("#source-pill").textContent = sourceLabel();
   if (state.courses.length) runRecommendation(false);
 };
 
@@ -142,6 +160,22 @@ $$("[data-preference]").forEach((button) => button.addEventListener("click", () 
   button.setAttribute("aria-pressed", String(active));
 }));
 
+const syncFoodControls = () => {
+  $$("[data-food-mode]").forEach((button) => button.classList.toggle("active", button.dataset.foodMode === state.foodStop));
+  $$("[data-food-type]").forEach((button) => button.classList.toggle("active", button.dataset.foodType === state.foodPreference));
+  $("#food-type-panel").hidden = state.foodStop === "none";
+};
+
+$$("[data-food-mode]").forEach((button) => button.addEventListener("click", () => {
+  state.foodStop = button.dataset.foodMode;
+  syncFoodControls();
+}));
+
+$$("[data-food-type]").forEach((button) => button.addEventListener("click", () => {
+  state.foodPreference = button.dataset.foodType;
+  syncFoodControls();
+}));
+
 $$("[data-crowd]").forEach((button) => button.addEventListener("click", () => {
   state.crowdTolerance = button.dataset.crowd;
   setExclusiveActive($$("[data-crowd]"), button);
@@ -156,52 +190,90 @@ const crowdMeta = (level) => ({
 
 const placeName = (place) => state.language === "ko" ? place.name_ko : place.name_en;
 const openingNote = (place) => state.language === "ko" ? place.opening_note_ko : place.opening_note_en;
+const isFoodPlace = (place) => ["restaurant", "cafe"].includes(place.place_type);
+const safeKakaoURL = (value) => {
+  try {
+    const url = new URL(value);
+    if (!["http:", "https:"].includes(url.protocol) || !["place.map.kakao.com", "map.kakao.com"].includes(url.hostname)) return null;
+    url.protocol = "https:";
+    return url.href;
+  } catch (_) {
+    return null;
+  }
+};
+
+const sourceLabel = () => {
+  if (state.foodStop !== "none" && state.dataSources?.kakao_local === "live") return t("sourceKakao");
+  return state.dataSources?.seoul_city_data === "live" ? t("sourceLive") : t("sourceEstimated");
+};
 
 const renderCourseCard = (course, index) => {
   const budget = course.time_budget;
   const totalAvailable = state.availableMinutes;
   const travelWidth = budget.travel_minutes / totalAvailable * 100;
-  const visitWidth = budget.visit_minutes / totalAvailable * 100;
+  const activityWidth = budget.activity_minutes / totalAvailable * 100;
+  const foodWidth = budget.food_minutes / totalAvailable * 100;
   const bufferWidth = budget.buffer_minutes / totalAvailable * 100;
   const stops = course.stops.map((stop) => {
     const crowd = crowdMeta(stop.crowd.level);
+    const place = stop.place;
+    const food = isFoodPlace(place);
+    const kakaoURL = safeKakaoURL(place.external_url);
+    const category = food ? `<span class="place-source">${t(place.place_type)}</span>` : "";
+    const address = food && place.address ? `<small class="place-address">${escapeHTML(place.address)}</small>` : "";
+    const distance = food && Number.isFinite(place.distance_meters)
+      ? `<span class="place-distance">${Math.round(place.distance_meters)}m ${t("distanceAway")}</span>`
+      : "";
+    const kakaoLink = food && kakaoURL
+      ? `<a class="place-link" href="${escapeHTML(kakaoURL)}" target="_blank" rel="noopener noreferrer">${t("kakaoMap")} <span aria-hidden="true">↗</span></a>`
+      : "";
     return `
       <li data-order="${stop.order}">
-        <span>
-          <strong>${escapeHTML(placeName(stop.place))}</strong>
-          <small>${stop.travel_from_previous_minutes} ${t("min")} ${t("travel").toLowerCase()} · ${escapeHTML(openingNote(stop.place))}</small>
+        <div>
+          <span class="place-title">${category}<strong>${escapeHTML(placeName(place))}</strong></span>
+          <small>${stop.travel_from_previous_minutes} ${t("min")} ${t("travel").toLowerCase()} · ${escapeHTML(openingNote(place))}</small>
+          ${address}
           <span class="crowd-label" style="--crowd-color:${crowd.color}"><i></i>${t("crowd")} · ${crowd[state.language]}</span>
-        </span>
-        <time>${stop.visit_minutes} ${t("min")}</time>
+          <span class="place-actions">${distance}${kakaoLink}</span>
+        </div>
+        <time><small>${t("stayTime")}</small>${stop.visit_minutes} ${t("min")}</time>
       </li>`;
   }).join("");
 
+  const foodBudget = budget.food_minutes > 0
+    ? `<span><i class="budget-food"></i>${t("foodTime")} ${budget.food_minutes}</span>`
+    : "";
+
   return `
-    <button class="course-card ${index === state.selectedCourse ? "active" : ""}" type="button" data-course-index="${index}">
-      <span class="course-card-main">
-        <span class="course-index">0${index + 1}</span>
-        <span class="course-heading">
-          <small>${escapeHTML(course.badge)}</small>
-          <h3>${escapeHTML(course.title)}</h3>
-          <p>${escapeHTML(course.stops.map((stop) => placeName(stop.place)).join(" → "))}</p>
+    <article class="course-card ${index === state.selectedCourse ? "active" : ""}">
+      <button class="course-card-toggle" type="button" data-course-index="${index}" aria-expanded="${index === state.selectedCourse}">
+        <span class="course-card-main">
+          <span class="course-index">0${index + 1}</span>
+          <span class="course-heading">
+            <small>${escapeHTML(course.badge)}</small>
+            <h3>${escapeHTML(course.title)}</h3>
+            <p>${escapeHTML(course.stops.map((stop) => placeName(stop.place)).join(" → "))}</p>
+          </span>
+          <span class="score-ring">${course.score}</span>
         </span>
-        <span class="score-ring">${course.score}</span>
-      </span>
-      <span class="course-card-details">
+      </button>
+      <div class="course-card-details">
         <ol class="stop-list">${stops}</ol>
         <span class="budget-label"><span>TIME BUDGET</span><span>${budget.total_minutes} / ${totalAvailable} ${t("min")}</span></span>
         <span class="time-budget">
           <i class="budget-travel" style="width:${travelWidth}%"></i>
-          <i class="budget-visit" style="width:${visitWidth}%"></i>
+          <i class="budget-visit" style="width:${activityWidth}%"></i>
+          <i class="budget-food" style="width:${foodWidth}%"></i>
           <i class="budget-buffer" style="width:${bufferWidth}%"></i>
         </span>
         <span class="budget-legend">
           <span><i class="budget-travel"></i>${t("travel")} ${budget.travel_minutes}</span>
-          <span><i class="budget-visit"></i>${t("visit")} ${budget.visit_minutes}</span>
+          <span><i class="budget-visit"></i>${t("visit")} ${budget.activity_minutes}</span>
+          ${foodBudget}
           <span><i class="budget-buffer"></i>${t("buffer")} ${budget.buffer_minutes}</span>
         </span>
-      </span>
-    </button>`;
+      </div>
+    </article>`;
 };
 
 const renderCourses = () => {
@@ -251,9 +323,12 @@ const renderMap = (course) => {
   const origin = window.L.marker(route[0], { icon: markerIcon("YOU", true) }).addTo(state.map).bindPopup(t("youAreHere"));
   state.mapLayers.push(origin);
   course.stops.forEach((stop, index) => {
+    const kakaoURL = safeKakaoURL(stop.place.external_url);
+    const category = isFoodPlace(stop.place) ? `<small>${t(stop.place.place_type)}</small><br>` : "";
+    const kakaoLink = kakaoURL ? `<br><a href="${escapeHTML(kakaoURL)}" target="_blank" rel="noopener noreferrer">${t("kakaoMap")} ↗</a>` : "";
     const marker = window.L.marker([stop.place.latitude, stop.place.longitude], { icon: markerIcon(String(index + 1)) })
       .addTo(state.map)
-      .bindPopup(`<b>${escapeHTML(placeName(stop.place))}</b><br>${t("stayTime")} · ${stop.visit_minutes}${state.language === "ko" ? "" : " "}${t("min")}`);
+      .bindPopup(`${category}<b>${escapeHTML(placeName(stop.place))}</b><br>${t("stayTime")} · ${stop.visit_minutes}${state.language === "ko" ? "" : " "}${t("min")}${kakaoLink}`);
     state.mapLayers.push(marker);
   });
   state.map.fitBounds(line.getBounds(), { padding: [45, 45], maxZoom: 15 });
@@ -280,6 +355,8 @@ const runRecommendation = async (scrollToResults = true) => {
         longitude: state.longitude,
         available_minutes: state.availableMinutes,
         preferences: [...state.preferences],
+        food_stop: state.foodStop,
+        food_preference: state.foodPreference,
         crowd_tolerance: state.crowdTolerance,
         language: state.language,
       }),
@@ -290,9 +367,10 @@ const runRecommendation = async (scrollToResults = true) => {
     }
     const data = await response.json();
     state.courses = data.courses;
+    state.dataSources = data.data_sources;
     state.selectedCourse = 0;
     $("#results-notice").textContent = data.notice;
-    $("#source-pill").textContent = data.data_sources.seoul_city_data === "live" ? t("sourceLive") : t("sourceEstimated");
+    $("#source-pill").textContent = sourceLabel();
     renderCourses();
     renderMap(state.courses[0]);
     $("#results").hidden = false;
@@ -312,6 +390,7 @@ $("#planner-form").addEventListener("submit", (event) => {
 });
 
 initializeMap();
+syncFoodControls();
 applyLanguage();
 updateClock();
 setInterval(updateClock, 30000);
@@ -319,11 +398,12 @@ setInterval(updateClock, 30000);
 fetch("/api/config")
   .then((response) => response.ok ? response.json() : Promise.reject(new Error("Config unavailable")))
   .then((config) => {
-    $("#source-pill").textContent = config.data_sources.seoul_city_data === "live" ? t("sourceLive") : t("sourceEstimated");
+    state.dataSources = config.data_sources;
+    $("#source-pill").textContent = sourceLabel();
   })
   .catch((error) => console.warn(error))
   .finally(() => {
-    if (new URLSearchParams(window.location.search).get("demo") === "1") {
+    if (queryParams.get("demo") === "1") {
       runRecommendation(false);
     }
   });

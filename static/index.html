@@ -16,7 +16,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="/assets/style.css?v=3" />
+    <link rel="stylesheet" href="/assets/style.css?v=4" />
   </head>
   <body>
     <header class="site-header">
@@ -75,7 +75,7 @@
           <p class="section-number">01 / PLAN</p>
           <div>
             <h2 data-i18n="plannerTitle">What does your free time look like?</h2>
-            <p data-i18n="plannerDescription">Four quick choices. No account, no over-planning.</p>
+            <p data-i18n="plannerDescription">Five quick choices. No account, no over-planning.</p>
           </div>
         </div>
 
@@ -119,16 +119,36 @@
             </legend>
             <div class="preference-grid">
               <button class="preference active" type="button" data-preference="photo" aria-pressed="true"><i>◫</i><span data-i18n="photo">Photo</span></button>
-              <button class="preference" type="button" data-preference="food" aria-pressed="false"><i>◌</i><span data-i18n="food">Food</span></button>
               <button class="preference active" type="button" data-preference="culture" aria-pressed="true"><i>◇</i><span data-i18n="culture">Culture</span></button>
               <button class="preference" type="button" data-preference="shopping" aria-pressed="false"><i>□</i><span data-i18n="shopping">Shopping</span></button>
               <button class="preference" type="button" data-preference="nature" aria-pressed="false"><i>⌁</i><span data-i18n="nature">Nature</span></button>
             </div>
           </fieldset>
 
-          <fieldset class="form-step crowd-step">
+          <fieldset class="form-step food-step">
             <legend>
               <span>04</span>
+              <span><b data-i18n="foodStopTitle">Add a food or café stop?</b><small data-i18n="foodStopHint">Only when it fits your real time budget</small></span>
+            </legend>
+            <div class="food-mode-options" role="group" aria-label="Food and cafe stop preference">
+              <button class="active" type="button" data-food-mode="none"><i>—</i><span><b data-i18n="foodNone">Skip it</b><small data-i18n="foodNoneHint">No food stops</small></span></button>
+              <button type="button" data-food-mode="optional"><i>＋</i><span><b data-i18n="foodOptional">Show me an option</b><small data-i18n="foodOptionalHint">One of three routes</small></span></button>
+              <button type="button" data-food-mode="required"><i>✓</i><span><b data-i18n="foodRequired">Make it part of the route</b><small data-i18n="foodRequiredHint">Include it whenever possible</small></span></button>
+            </div>
+            <div class="food-type-panel" id="food-type-panel" hidden>
+              <small data-i18n="foodTypeTitle">WHAT SOUNDS GOOD?</small>
+              <div class="food-type-options" role="group" aria-label="Food stop type">
+                <button type="button" data-food-type="quick" data-i18n="foodQuick">Quick bite</button>
+                <button type="button" data-food-type="meal" data-i18n="foodMeal">Full meal</button>
+                <button type="button" data-food-type="cafe" data-i18n="foodCafe">Café & dessert</button>
+                <button class="active" type="button" data-food-type="any" data-i18n="foodAny">Anything</button>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-step crowd-step">
+            <legend>
+              <span>05</span>
               <span><b data-i18n="crowdTitle">How do you feel about crowds?</b><small data-i18n="crowdHint">We’ll tune the route around you</small></span>
             </legend>
             <div class="crowd-options" role="group" aria-label="Crowd tolerance">
@@ -201,6 +221,6 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="/assets/app.js?v=3" defer></script>
+    <script src="/assets/app.js?v=4" defer></script>
   </body>
 </html>

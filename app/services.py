@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import threading
 import time
@@ -7,7 +8,7 @@ from datetime import datetime
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
-from app.models import CrowdSnapshot, Place
+from app.models import CrowdSnapshot, FoodPreference, Place
 
 
 class TTLCache:
@@ -219,3 +220,206 @@ class TourAPIService:
             indexed[title.replace(" ", "")] = item
             indexed[title.lower().replace(" ", "")] = item
         return indexed
+
+
+class KakaoLocalService:
+    API_URL = "https://dapi.kakao.com/v2/local/search/category.json"
+    QUICK_KEYWORDS = {
+        "간식",
+        "국수",
+        "김밥",
+        "도넛",
+        "떡볶이",
+        "만두",
+        "베이커리",
+        "분식",
+        "샌드위치",
+        "제과",
+        "패스트푸드",
+    }
+
+    def __init__(self) -> None:
+        self.api_key = os.getenv("KAKAO_REST_API_KEY", "").strip()
+        self.cache = TTLCache(ttl_seconds=900)
+
+    @property
+    def is_live(self) -> bool:
+        return bool(self.api_key)
+
+    def search_nearby(
+        self,
+        latitude: float,
+        longitude: float,
+        food_preference: FoodPreference,
+        reference_places: list[Place],
+        radius_meters: int = 1500,
+    ) -> list[Place]:
+        if not self.is_live:
+            return []
+
+        radius_meters = max(300, min(radius_meters, 5000))
+        cache_key = f"{latitude:.3f}:{longitude:.3f}:{food_preference}:{radius_meters // 250}"
+        cached = self.cache.get(cache_key)
+        if isinstance(cached, list):
+            return cached
+
+        categories = ["CE7"] if food_preference == "cafe" else ["FD6"]
+        if food_preference == "any":
+            categories = ["FD6", "CE7"]
+
+        documents_by_category: dict[str, list[dict]] = {}
+        for category in categories:
+            try:
+                documents_by_category[category] = self._fetch_category(
+                    category,
+                    latitude,
+                    longitude,
+                    radius_meters,
+                )
+            except (OSError, TimeoutError, ValueError, KeyError, json.JSONDecodeError):
+                documents_by_category[category] = []
+
+        places_by_category = {
+            category: self._parse_documents(
+                documents,
+                category,
+                food_preference,
+                reference_places,
+            )
+            for category, documents in documents_by_category.items()
+        }
+        if food_preference == "any":
+            places = places_by_category.get("FD6", [])[:5] + places_by_category.get("CE7", [])[:4]
+            places.sort(key=lambda place: place.distance_meters or 999999)
+        else:
+            places = places_by_category.get(categories[0], [])[:9]
+
+        self.cache.set(cache_key, places)
+        return places
+
+    def _fetch_category(
+        self,
+        category: str,
+        latitude: float,
+        longitude: float,
+        radius_meters: int,
+    ) -> list[dict]:
+        query = urlencode(
+            {
+                "category_group_code": category,
+                "x": longitude,
+                "y": latitude,
+                "radius": radius_meters,
+                "sort": "distance",
+                "size": 15,
+                "page": 1,
+            }
+        )
+        request = Request(
+            f"{self.API_URL}?{query}",
+            headers={
+                "Authorization": f"KakaoAK {self.api_key}",
+                "User-Agent": "NOW-SEOUL/1.0",
+            },
+        )
+        with urlopen(request, timeout=5) as response:
+            payload = json.load(response)
+        documents = payload.get("documents", [])
+        if not isinstance(documents, list):
+            raise ValueError("Kakao Local response did not contain a document list")
+        return documents
+
+    def _parse_documents(
+        self,
+        documents: list[dict],
+        category_code: str,
+        food_preference: FoodPreference,
+        reference_places: list[Place],
+    ) -> list[Place]:
+        parsed: list[Place] = []
+        seen_ids: set[str] = set()
+
+        for document in documents:
+            kakao_id = str(document.get("id") or "").strip()
+            name = str(document.get("place_name") or "").strip()
+            if not kakao_id or not name or kakao_id in seen_ids:
+                continue
+            try:
+                latitude = float(document["y"])
+                longitude = float(document["x"])
+            except (KeyError, TypeError, ValueError):
+                continue
+
+            seen_ids.add(kakao_id)
+            category_name = str(document.get("category_name") or "").strip()
+            is_cafe = category_code == "CE7"
+            is_quick = any(keyword in category_name for keyword in self.QUICK_KEYWORDS)
+            if is_cafe:
+                duration, minimum_duration = 40, 30
+            elif food_preference == "quick" or is_quick:
+                duration, minimum_duration = 35, 25
+            else:
+                duration, minimum_duration = 55, 45
+
+            address = str(
+                document.get("road_address_name") or document.get("address_name") or ""
+            ).strip()
+            distance_text = str(document.get("distance") or "").strip()
+            distance_meters = int(distance_text) if distance_text.isdigit() else None
+            hotspot = self._nearest_hotspot(latitude, longitude, reference_places)
+            place_type = "cafe" if is_cafe else "restaurant"
+            label_en = "Café" if is_cafe else "Restaurant"
+            label_ko = "카페" if is_cafe else "음식점"
+
+            parsed.append(
+                Place(
+                    id=f"kakao-{kakao_id}",
+                    name_en=name,
+                    name_ko=name,
+                    description_en=f"Nearby {label_en.lower()} from Kakao Local",
+                    description_ko=f"카카오 로컬에서 찾은 주변 {label_ko}",
+                    latitude=latitude,
+                    longitude=longitude,
+                    duration_minutes=duration,
+                    minimum_duration_minutes=minimum_duration,
+                    tags=["food"],
+                    hotspot=hotspot,
+                    indoor=True,
+                    opening_note_en="Check live hours on Kakao Map",
+                    opening_note_ko="카카오맵에서 영업 여부 확인",
+                    place_type=place_type,
+                    data_source="kakao-local",
+                    category_name=category_name or label_ko,
+                    address=address or None,
+                    distance_meters=distance_meters,
+                    external_url=str(document.get("place_url") or "").strip() or None,
+                )
+            )
+
+        if food_preference == "quick":
+            parsed.sort(
+                key=lambda place: (
+                    not any(keyword in (place.category_name or "") for keyword in self.QUICK_KEYWORDS),
+                    place.distance_meters or 999999,
+                )
+            )
+        else:
+            parsed.sort(key=lambda place: place.distance_meters or 999999)
+        return parsed
+
+    @staticmethod
+    def _nearest_hotspot(latitude: float, longitude: float, reference_places: list[Place]) -> str:
+        if not reference_places:
+            return "명동 관광특구"
+
+        def distance(place: Place) -> float:
+            phi1, phi2 = math.radians(latitude), math.radians(place.latitude)
+            delta_phi = math.radians(place.latitude - latitude)
+            delta_lambda = math.radians(place.longitude - longitude)
+            value = (
+                math.sin(delta_phi / 2) ** 2
+                + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
+            )
+            return 6371.0 * 2 * math.atan2(math.sqrt(value), math.sqrt(1 - value))
+
+        return min(reference_places, key=distance).hotspot
