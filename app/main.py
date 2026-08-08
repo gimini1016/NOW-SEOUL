@@ -34,7 +34,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/assets", StaticFiles(directory=ASSET_DIR), name="assets")
+# Vercel removes ``public/`` from the Python function bundle and serves it from
+# its CDN. Local development and Render still need FastAPI to expose the same
+# asset URLs, so only mount the directory when it is present in this runtime.
+if ASSET_DIR.is_dir():
+    app.mount("/assets", StaticFiles(directory=ASSET_DIR), name="assets")
 
 crowd_service = SeoulCrowdService()
 tour_service = TourAPIService()
