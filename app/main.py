@@ -15,7 +15,8 @@ from app.services import KakaoLocalService, SeoulCrowdService, TourAPIService
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-STATIC_DIR = BASE_DIR / "static"
+PUBLIC_DIR = BASE_DIR / "public"
+ASSET_DIR = PUBLIC_DIR / "assets"
 SEOUL_TZ = ZoneInfo("Asia/Seoul")
 
 app = FastAPI(
@@ -33,7 +34,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/assets", StaticFiles(directory=STATIC_DIR), name="assets")
+app.mount("/assets", StaticFiles(directory=ASSET_DIR), name="assets")
 
 crowd_service = SeoulCrowdService()
 tour_service = TourAPIService()
@@ -52,7 +53,7 @@ def data_source_status() -> DataSourceStatus:
 
 @app.get("/", include_in_schema=False)
 def homepage() -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html")
+    return FileResponse(PUBLIC_DIR / "index.html")
 
 
 @app.get("/api/health", tags=["system"])

@@ -58,7 +58,7 @@ ALLOWED_ORIGINS=*
 uvicorn app.main:app --reload --env-file .env
 ```
 
-API 키는 절대 `static/app.js`나 GitHub 저장소에 넣지 마세요. `.env`는 `.gitignore`에
+API 키는 절대 `public/assets/app.js`나 GitHub 저장소에 넣지 마세요. `.env`는 `.gitignore`에
 포함되어 있습니다.
 
 ## API
@@ -124,3 +124,19 @@ uvicorn app.main:app --host 0.0.0.0 --port $PORT
 
 배포 환경변수에 `KAKAO_REST_API_KEY`를 추가하면 음식점·카페 추천이 활성화됩니다.
 `TOUR_API_KEY`, `SEOUL_OPEN_DATA_KEY`는 선택 사항입니다.
+
+## Vercel 배포
+
+Vercel에서 이 GitHub 저장소를 Import하면 루트 `main.py`의 FastAPI `app`을
+Python Function으로 자동 감지합니다. `public/`의 홈페이지·CSS·JavaScript·이미지는
+CDN에서 정적 파일로 제공됩니다.
+
+Vercel Project Settings의 Environment Variables에 다음 값을 추가합니다.
+
+```dotenv
+KAKAO_REST_API_KEY=카카오_디벨로퍼스_REST_API_키
+ALLOWED_ORIGINS=*
+```
+
+`TOUR_API_KEY`, `SEOUL_OPEN_DATA_KEY`는 필요할 때만 추가합니다. `vercel.json`은
+FastAPI Function을 서울(`icn1`) 리전에 배치합니다.

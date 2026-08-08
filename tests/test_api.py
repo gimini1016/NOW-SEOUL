@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 
 from app.main import app, kakao_service
 from app.models import Place
+from main import app as vercel_app
 
 
 client = TestClient(app)
@@ -10,12 +11,16 @@ client = TestClient(app)
 def test_health_and_homepage():
     health = client.get("/api/health")
     homepage = client.get("/")
+    javascript = client.get("/assets/app.js")
 
+    assert vercel_app is app
     assert health.status_code == 200
     assert health.json()["status"] == "ok"
     assert homepage.status_code == 200
     assert "NOW SEOUL" in homepage.text
     assert "data-food-mode" in homepage.text
+    assert javascript.status_code == 200
+    assert "runRecommendation" in javascript.text
 
 
 def test_config_exposes_demo_mode_without_keys():
