@@ -310,31 +310,87 @@ footer { display: flex; padding: 31px 5vw; align-items: center; justify-content:
 
 @media (max-width: 620px) {
   .site-header { background: rgba(247, 241, 230, .9); backdrop-filter: blur(10px); }
+  .brand { font-size: 15px; }
   .brand small { display: none; }
+  .brand-mark { width: 40px; height: 40px; font-size: 14px; }
+  .language-switch button { width: 44px; height: 38px; font-size: 12px; }
   .hero { padding-top: 120px; }
+  .eyebrow { margin-bottom: 20px; font-size: 11px; line-height: 1.45; }
   .hero h1 { font-size: 15vw; }
   html[lang="ko"] .hero h1 { font-size: 12.5vw; line-height: 1.22; }
-  .hero-description { font-size: 13px; }
+  .hero-description { font-size: 16px; line-height: 1.7; }
+  .hero-cta { min-height: 52px; padding-left: 20px; font-size: 14px; }
+  .hero-proof strong { font-size: 26px; }
+  .hero-proof small { font-size: 10px; line-height: 1.35; }
   .hero-proof { gap: 15px; }
   .hero-proof span { padding-right: 15px; }
   .hero-visual { height: 118vw; max-height: 560px; }
   .mini-itinerary { top: 25px; left: 12px; width: 175px; }
+  .mini-itinerary span { font-size: 9px; }
+  .mini-itinerary strong { font-size: 18px; }
+  .mini-itinerary small { font-size: 11px; line-height: 1.4; }
   .photo-caption { right: 13px; bottom: 13px; }
+  .photo-caption span { font-size: 9px; }
+  .photo-caption strong { font-size: 11px; }
+  .section-number { font-size: 11px; }
+  .section-intro > div > p { font-size: 16px; line-height: 1.65; }
+  .planner, .results { padding: 76px 18px; }
   .planner-form { grid-template-columns: 1fr; }
   .form-step { padding: 27px 18px; }
+  .form-step legend > span:first-child { min-width: 34px; height: 34px; font-size: 11px; }
+  .form-step legend b { font-size: 17px; }
+  .form-step legend small { font-size: 13px; line-height: 1.45; }
+  .gps-button { min-height: 64px; }
+  .gps-button b { font-size: 15px; }
+  .gps-button small { font-size: 12px; }
+  .preset, .time-options button { min-height: 44px; padding: 10px 13px; font-size: 13px; }
+  .time-display span { font-size: 12px; }
   .preference-grid { grid-template-columns: repeat(2, 1fr); }
+  .preference { min-height: 92px; font-size: 14px; }
+  .food-mode-options button, .crowd-options button { min-height: 60px; padding: 13px 14px; }
+  .food-mode-options button > i { width: 28px; height: 28px; flex-basis: 28px; font-size: 12px; }
+  .food-mode-options b, .crowd-options b { font-size: 14px; }
+  .food-mode-options small, .crowd-options small { font-size: 12px; line-height: 1.4; }
+  .food-type-panel > small { font-size: 11px; }
+  .food-type-options button { min-height: 44px; font-size: 13px; }
+  .submit-button { min-height: 68px; font-size: 17px; }
+  .form-error { font-size: 14px; line-height: 1.5; }
+  .result-kicker { font-size: 11px !important; }
   .course-card-main { padding: 18px; grid-template-columns: 38px 1fr auto; gap: 10px; }
-  .course-index { font-size: 18px; }
-  .course-heading h3 { font-size: 20px; }
-  .score-ring { width: 42px; height: 42px; }
-  .course-card-details { padding: 0 18px 18px 66px; }
+  .course-index { font-size: 21px; }
+  .course-heading small { font-size: 11px; line-height: 1.4; }
+  .course-heading h3 { font-size: 23px; line-height: 1.25; }
+  .course-heading p { font-size: 14px; line-height: 1.45; text-overflow: initial; white-space: normal; }
+  .score-ring { width: 44px; height: 44px; font-size: 12px; }
+  .course-card-details { padding: 0 18px 20px; }
   .stop-list li { grid-template-columns: 1fr; }
-  .stop-list time { width: max-content; }
+  .stop-list strong { font-size: 15px; line-height: 1.4; }
+  .stop-list small { font-size: 12px; line-height: 1.45; }
+  .place-source { padding: 5px 8px; font-size: 9px; }
+  .place-address { max-width: 100%; white-space: normal; }
+  .place-actions { margin-top: 9px; gap: 12px; font-size: 12px; }
+  .place-link { display: inline-flex; min-height: 36px; align-items: center; }
+  .stop-list time { width: max-content; align-items: flex-start; font-size: 12px; }
+  .stop-list time small { font-size: 10px; }
+  .crowd-label { margin-top: 8px; font-size: 11px; line-height: 1.4; }
+  .budget-label { font-size: 11px; line-height: 1.4; }
+  .time-budget { height: 12px; }
+  .budget-legend { flex-wrap: wrap; gap: 8px 13px; font-size: 10px; line-height: 1.4; }
+  .map-header small { font-size: 11px; }
+  .map-header strong { font-size: 21px; }
+  .source-pill { font-size: 10px; }
   #route-map, .map-fallback { height: 430px; min-height: 430px; }
   .map-header { align-items: flex-start; flex-direction: column; gap: 12px; }
-  .map-legend { align-items: flex-start; flex-direction: column; gap: 7px; padding: 14px 18px; }
+  .map-legend { align-items: flex-start; flex-direction: column; gap: 9px; padding: 16px 18px; font-size: 11px; line-height: 1.4; }
+  .leaflet-popup-content { font-size: 14px; }
+  .method-copy p { font-size: 16px; line-height: 1.7; }
+  .method-steps span { font-size: 12px; }
+  .method-steps b { font-size: 15px; }
+  .method-steps small { font-size: 12px; line-height: 1.5; }
+  .loading-overlay strong { font-size: 25px; }
+  .loading-overlay small { font-size: 13px; }
   .route-disclaimer { margin-left: 0; }
-  footer { align-items: flex-start; flex-direction: column; gap: 18px; }
+  footer { align-items: flex-start; flex-direction: column; gap: 18px; font-size: 11px; line-height: 1.5; }
 }
 
 @media (prefers-reduced-motion: reduce) {
